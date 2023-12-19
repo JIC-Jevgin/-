@@ -1,0 +1,66 @@
+body{
+	background-image: url(images/1.jpg);
+	background-size: 1980px 1080px;
+}
+
+#block_langueg{
+	text-align: right;
+	size: 16px;
+}
+
+.dis{
+	padding: 0px;
+	
+}
+
+.dis{
+	padding: 0px;
+	
+}
+
+.uk{
+	transition: 0.5s;
+	border-radius: 500px;
+	border-color: purple;
+	background-image: url(images/uk.png);
+}
+
+.cz{
+	transition: 0.5s;
+	border-radius: 500px;
+	border-color: purple;
+	background-image: url(images/cz.png);
+}
+
+.uk:hover{
+	opacity: 8;
+	cursor: pointer;
+	transition: 0.5s;
+	border-color: green;
+}
+
+.cz:hover{
+	opacity: 8;
+	cursor: pointer;
+	transition: 0.5s;
+	border-color: green;
+}
+
+#block_block{
+	text-align: center;
+}
+
+.test{
+	transition: 0.5s;
+	background: white;
+	border-radius: 500px;
+	border-color: purple;
+	padding-left: 100px;
+	padding-right: 100px;
+}
+
+.test:hover{
+	transition: 0.5s;
+	background: yellow;
+	
+}
