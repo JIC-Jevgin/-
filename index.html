@@ -186,8 +186,8 @@ img {
   <div class="info">
     💡 Генератор создаст абсурдную идею и 3 кадра для видео<br>
     <small style="color: #666; margin-top: 5px; display: block;">
-      ⚠️ API X.AI может быть заблокирован из браузера (CORS-политика)<br>
-      Если не работает - используйте расширение для обхода CORS или VPN
+      ✅ Использует CORS-прокси для обхода блокировок<br>
+      Можно загружать на GitHub Pages!
     </small>
   </div>
 </div>
@@ -219,12 +219,15 @@ function showResult(title, content) {
   return div;
 }
 
+// Используем CORS-прокси для обхода блокировки
+const PROXY = 'https://corsproxy.io/?';
+
 async function apiChat(prompt) {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-    const response = await fetch('https://api.x.ai/v1/chat/completions', {
+    const response = await fetch(PROXY + encodeURIComponent('https://api.x.ai/v1/chat/completions'), {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -239,8 +242,7 @@ async function apiChat(prompt) {
         temperature: 0.9,
         max_tokens: 100
       }),
-      signal: controller.signal,
-      mode: 'cors'
+      signal: controller.signal
     });
 
     clearTimeout(timeoutId);
@@ -269,7 +271,7 @@ async function apiChat(prompt) {
       throw new Error('Превышено время ожидания. Попробуйте еще раз');
     }
     if (error.message === 'Failed to fetch') {
-      throw new Error('CORS или блокировка API. Возможно нужен прокси или VPN');
+      throw new Error('Не удалось подключиться к API. Проверьте ключ и интернет');
     }
     throw new Error(error.message);
   }
@@ -280,7 +282,7 @@ async function apiImage(prompt) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-    const response = await fetch('https://api.x.ai/v1/images/generations', {
+    const response = await fetch(PROXY + encodeURIComponent('https://api.x.ai/v1/images/generations'), {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -292,8 +294,7 @@ async function apiImage(prompt) {
         n: 1,
         size: '512x512'
       }),
-      signal: controller.signal,
-      mode: 'cors'
+      signal: controller.signal
     });
 
     clearTimeout(timeoutId);
@@ -322,7 +323,7 @@ async function apiImage(prompt) {
       throw new Error('Превышено время ожидания. Попробуйте еще раз');
     }
     if (error.message === 'Failed to fetch') {
-      throw new Error('CORS или блокировка API. Возможно нужен прокси или VPN');
+      throw new Error('Не удалось подключиться к API. Проверьте ключ и интернет');
     }
     throw new Error(error.message);
   }
