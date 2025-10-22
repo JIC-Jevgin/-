@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🎬 AI Видео Генератор</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:sans-serif;background:#000;color:#fff;padding:20px;min-height:100vh}
+.container{max-width:600px;margin:0 auto;background:#111;padding:30px;border-radius:20px}
+h1{text-align:center;color:#00ff88;margin-bottom:30px;font-size:2em}
+input{width:100%;padding:15px;background:#222;border:2px solid #333;border-radius:12px;color:#fff;font-size:16px;margin:15px 0}
+button{width:100%;padding:18px;background:linear-gradient(45deg,#ff6b35,#f7931e);border:none;border-radius:12px;color:#fff;font-size:18px;font-weight:700;cursor:pointer;margin:10px 0;transition:.3s}
+button:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(255,107,53,.3)}
+button:disabled{background:#666;cursor:not-allowed;transform:none}
+.result{margin:20px 0;padding:20px;background:#0a1a0a;border-radius:12px;border-left:5px solid #00ff88;font-family:monospace}
+.frame{text-align:center;margin:15px 0}
+.frame img{max-width:100%;border-radius:12px;height:250px;object-fit:cover;box-shadow:0 10px 30px rgba(0,255,136,.2)}
+#status{text-align:center;padding:15px;background:#1a1a0a;border-radius:12px;margin:20px 0;border-left:5px solid #ffa500;font-weight:700}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🎬 AI Видео Генератор</h1>
+<p style="text-align:center;color:#ccc">xAI Grok • 3 кадра для MP4</p>
+
+<input type="password" id="apiKey" placeholder="xai-... (твой секретный ключ)">
+<button onclick="generateVideo()">🚀 ГЕНЕРИРОВАТЬ ВИДЕО</button>
+
+<div id="status">Введи API ключ и жми кнопку!</div>
+<div id="results"></div>
+</div>
+
+<script>
+let apiKey='';
+async function apiChat(prompt){  
+  const res=await fetch('https://api.x.ai/v1/chat/completions',{method:'POST',headers:{'Authorization':`Bearer ${apiKey}`,'Content-Type':'application/json'},body:JSON.stringify({model:'grok-3',messages:[{role:'user',content:prompt}],max_tokens:100})});
+  const data=await res.json();
+  return data.choices?.[0]?.message?.content||'Ошибка';
+}
+async function apiImage(prompt){
+  const res=await fetch('https://api.x.ai/v1/images/generations',{method:'POST',headers:{'Authorization':`Bearer ${apiKey}`,'Content-Type':'application/json'},body:JSON.stringify({model:'grok-2-image-1212',prompt,n:1,size:'512x512'})});
+  const data=await res.json();
+  return data.data?.[0]?.url||null;
+}
+window.generateVideo=async()=>{
+  apiKey=document.getElementById('apiKey').value.trim();
+  if(!apiKey){document.getElementById('status').innerHTML='❌ Введи ключ!';return}
+  
+  document.getElementById('results').innerHTML='';
+  document.getElementById('status').innerHTML='🎬 Генерируем идею...';
+  
+  const idea=await apiChat('Придумай АБСУРДНУЮ идею для 5-секундного видео с животными. Одно предложение.');
+  document.getElementById('results').innerHTML+=`<div class="result"><strong>🎬 Идея:</strong><br>${idea}</div>`;
+  
+  document.getElementById('status').innerHTML='🖼️ Генерируем 3 кадра...';
+  for(let i=1;i<=3;i++){
+    const framePrompt=`${idea}. Кадр ${i}:`;
+    const imgUrl=await apiImage(framePrompt);
+    const frameDiv=document.createElement('div');
+    frameDiv.className='result frame';
+    frameDiv.innerHTML=`<strong>🖼️ Кадр ${i}:</strong><br><img src="${imgUrl}" onerror="this.outerHTML='<div style=\\"background:#333;height:250px;border-radius:12px;display:flex;align-items:center;justify-content:center\\">🔄 Загрузка...</div>'">`;
+    document.getElementById('results').appendChild(frameDiv);
+  }
+  document.getElementById('status').innerHTML='🎉 ВИДЕО ГОТОВО! 3 кадра для MP4';
+};
+</script>
+</body>
+</html>
