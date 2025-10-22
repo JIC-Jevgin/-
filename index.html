@@ -186,7 +186,8 @@ img {
   <div class="info">
     💡 Генератор создаст абсурдную идею и 3 кадра для видео<br>
     <small style="color: #666; margin-top: 5px; display: block;">
-      Убедитесь, что у вас стабильное интернет-соединение
+      ⚠️ API X.AI может быть заблокирован из браузера (CORS-политика)<br>
+      Если не работает - используйте расширение для обхода CORS или VPN
     </small>
   </div>
 </div>
@@ -220,6 +221,9 @@ function showResult(title, content) {
 
 async function apiChat(prompt) {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
     const response = await fetch('https://api.x.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -234,8 +238,12 @@ async function apiChat(prompt) {
         }],
         temperature: 0.9,
         max_tokens: 100
-      })
+      }),
+      signal: controller.signal,
+      mode: 'cors'
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -257,15 +265,21 @@ async function apiChat(prompt) {
 
     return data.choices[0].message.content;
   } catch (error) {
-    if (error.message === 'Failed to fetch') {
-      throw new Error('Ошибка сети. Проверьте подключение к интернету');
+    if (error.name === 'AbortError') {
+      throw new Error('Превышено время ожидания. Попробуйте еще раз');
     }
-    throw new Error(`Чат API: ${error.message}`);
+    if (error.message === 'Failed to fetch') {
+      throw new Error('CORS или блокировка API. Возможно нужен прокси или VPN');
+    }
+    throw new Error(error.message);
   }
 }
 
 async function apiImage(prompt) {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
     const response = await fetch('https://api.x.ai/v1/images/generations', {
       method: 'POST',
       headers: {
@@ -277,8 +291,12 @@ async function apiImage(prompt) {
         prompt: prompt,
         n: 1,
         size: '512x512'
-      })
+      }),
+      signal: controller.signal,
+      mode: 'cors'
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -300,10 +318,13 @@ async function apiImage(prompt) {
 
     return data.data[0].url;
   } catch (error) {
-    if (error.message === 'Failed to fetch') {
-      throw new Error('Ошибка сети. Проверьте подключение к интернету');
+    if (error.name === 'AbortError') {
+      throw new Error('Превышено время ожидания. Попробуйте еще раз');
     }
-    throw new Error(`Image API: ${error.message}`);
+    if (error.message === 'Failed to fetch') {
+      throw new Error('CORS или блокировка API. Возможно нужен прокси или VPN');
+    }
+    throw new Error(error.message);
   }
 }
 
