@@ -1,466 +1,773 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>🎬 AI Видео</title>
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoHub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-  color: #fff;
-  padding: 20px;
-  min-height: 100vh;
-}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+        }
 
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-}
+        header {
+            background: #161b22;
+            padding: 12px 24px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
 
-h1 {
-  text-align: center;
-  color: #00ff88;
-  margin-bottom: 30px;
-  font-size: 2em;
-  text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
-}
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #58a6ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-input {
-  width: 100%;
-  padding: 15px;
-  background: #222;
-  border: 2px solid #333;
-  border-radius: 12px;
-  color: #fff;
-  font-size: 16px;
-  margin: 15px 0;
-  transition: border-color 0.3s;
-}
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            display: flex;
+        }
 
-input:focus {
-  outline: none;
-  border-color: #00ff88;
-}
+        .search-bar input {
+            flex: 1;
+            padding: 10px 16px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 4px 0 0 4px;
+            color: #c9d1d9;
+            outline: none;
+        }
 
-button {
-  width: 100%;
-  padding: 18px;
-  background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
-  border: none;
-  border-radius: 12px;
-  color: #fff;
-  font-size: 18px;
-  font-weight: 700;
-  cursor: pointer;
-  margin: 10px 0;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
+        .search-bar input:focus {
+            border-color: #58a6ff;
+        }
 
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(255, 107, 53, 0.4);
-}
+        .search-bar button {
+            padding: 10px 20px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-left: none;
+            border-radius: 0 4px 4px 0;
+            color: #c9d1d9;
+            cursor: pointer;
+        }
 
-button:active {
-  transform: translateY(0);
-}
+        .search-bar button:hover {
+            background: #30363d;
+        }
 
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-.result {
-  margin: 20px 0;
-  padding: 20px;
-  background: rgba(10, 26, 10, 0.6);
-  border-radius: 12px;
-  border-left: 5px solid #00ff88;
-  animation: slideIn 0.3s ease;
-}
+        .user-name {
+            color: #58a6ff;
+            font-weight: 500;
+        }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+        .btn {
+            padding: 8px 16px;
+            background: #238636;
+            border: 1px solid #2ea043;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
 
-.url-box {
-  background: #1a1a1a;
-  padding: 10px;
-  border-radius: 8px;
-  margin: 10px 0;
-  font-size: 12px;
-  word-break: break-all;
-  font-family: 'Courier New', monospace;
-  color: #00ff88;
-}
+        .btn:hover {
+            background: #2ea043;
+        }
 
-.error {
-  background: rgba(139, 0, 0, 0.3);
-  border-left-color: #ff4444;
-  white-space: pre-line;
-}
+        .btn-secondary {
+            background: #21262d;
+            border-color: #30363d;
+        }
 
-.loading {
-  text-align: center;
-  padding: 20px;
-  color: #00ff88;
-}
+        .btn-secondary:hover {
+            background: #30363d;
+        }
 
-.spinner {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(0, 255, 136, 0.3);
-  border-top-color: #00ff88;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-right: 10px;
-}
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+        .modal.active {
+            display: flex;
+        }
 
-details {
-  margin-top: 10px;
-  cursor: pointer;
-}
+        .modal-content {
+            background: #161b22;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
 
-summary {
-  padding: 10px;
-  background: #2a2a2a;
-  border-radius: 8px;
-  user-select: none;
-}
+        .modal-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #58a6ff;
+        }
 
-summary:hover {
-  background: #333;
-}
+        .form-group {
+            margin-bottom: 16px;
+        }
 
-img {
-  width: 100%;
-  border-radius: 12px;
-  margin-top: 10px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-}
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
 
-.info {
-  text-align: center;
-  color: #888;
-  font-size: 14px;
-  margin-top: 20px;
-}
-</style>
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #58a6ff;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        main {
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .video-card {
+            background: #161b22;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #30363d;
+        }
+
+        .video-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            border-color: #58a6ff;
+        }
+
+        .thumbnail {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .thumbnail video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #238636, #58a6ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        .duration {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .video-info {
+            padding: 12px;
+        }
+
+        .video-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .video-meta {
+            font-size: 14px;
+            color: #8b949e;
+        }
+
+        .channel-name {
+            margin-bottom: 4px;
+        }
+
+        .views-date {
+            font-size: 13px;
+        }
+
+        .play-icon {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 10;
+        }
+
+        .video-card:hover .play-icon {
+            opacity: 1;
+        }
+
+        .play-icon::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-left: 20px solid white;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            margin-left: 4px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 20px;
+            color: #c9d1d9;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: #58a6ff;
+            color: #0d1117;
+            border-color: #58a6ff;
+        }
+
+        .video-player-modal .modal-content {
+            max-width: 1200px;
+            width: 95%;
+        }
+
+        .video-player {
+            width: 100%;
+            background: #000;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .video-details {
+            padding: 16px;
+        }
+
+        .video-details h2 {
+            margin-bottom: 12px;
+        }
+
+        .video-details-meta {
+            color: #8b949e;
+            margin-bottom: 16px;
+        }
+
+        .video-description {
+            line-height: 1.6;
+            color: #c9d1d9;
+        }
+
+        .error {
+            color: #f85149;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 40px;
+            border: 2px dashed #30363d;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-input-label:hover {
+            border-color: #58a6ff;
+            background: rgba(88, 166, 255, 0.1);
+        }
+
+        .file-input-label input {
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8b949e;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-  <h1>🎬 AI Видео Генератор</h1>
-  
-  <input 
-    type="password" 
-    id="apiKey" 
-    placeholder="Введите API ключ X.AI (xai-...)"
-    autocomplete="off"
-  >
-  
-  <button id="generateBtn" onclick="generate()">
-    🚀 ГЕНЕРИРОВАТЬ ВИДЕО
-  </button>
-  
-  <div id="results"></div>
-  
-  <div class="info">
-    💡 Генератор создаст абсурдную идею и 3 кадра для видео<br>
-    <small style="color: #666; margin-top: 5px; display: block;">
-      ✅ Использует CORS-прокси для обхода блокировок<br>
-      Можно загружать на GitHub Pages!
-    </small>
-  </div>
-</div>
+    <header>
+        <div class="logo">
+            <span>▶</span> VideoHub
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Поиск видео..." id="searchInput">
+            <button onclick="searchVideos()">🔍</button>
+        </div>
+        <div class="user-section" id="userSection">
+            <button class="btn" onclick="showLoginModal()">Войти</button>
+        </div>
+    </header>
 
-<script>
-let apiKey = '';
-let isGenerating = false;
+    <main>
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterVideos('all')">Все</button>
+            <button class="filter-btn" onclick="filterVideos('tutorial')">Уроки</button>
+            <button class="filter-btn" onclick="filterVideos('music')">Музыка</button>
+            <button class="filter-btn" onclick="filterVideos('gaming')">Игры</button>
+            <button class="filter-btn" onclick="filterVideos('tech')">Технологии</button>
+        </div>
 
-function showLoading(text) {
-  const div = document.createElement('div');
-  div.className = 'loading';
-  div.innerHTML = `<div class="spinner"></div>${text}`;
-  document.getElementById('results').appendChild(div);
-  return div;
-}
+        <div class="video-grid" id="videoGrid"></div>
+    </main>
 
-function showError(message) {
-  const div = document.createElement('div');
-  div.className = 'result error';
-  div.innerHTML = `<strong>❌ Ошибка:</strong><br>${message}`;
-  document.getElementById('results').appendChild(div);
-}
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">Вход в систему</div>
+            <div class="form-group">
+                <label>Имя пользователя</label>
+                <input type="text" id="loginUsername" placeholder="admin или guest">
+            </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" id="loginPassword" placeholder="Введите пароль">
+            </div>
+            <div class="error" id="loginError"></div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeModal('loginModal')">Отмена</button>
+                <button class="btn" onclick="login()">Войти</button>
+            </div>
+            <p style="margin-top: 16px; font-size: 14px; color: #8b949e;">
+                <strong>Для входа:</strong><br>
+                Администратор: admin / admin123<br>
+                Гость: guest / guest123
+            </p>
+        </div>
+    </div>
 
-function showResult(title, content) {
-  const div = document.createElement('div');
-  div.className = 'result';
-  div.innerHTML = `<strong>${title}</strong><br>${content}`;
-  document.getElementById('results').appendChild(div);
-  return div;
-}
+    <!-- Upload Modal -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">Загрузить видео</div>
+            <div class="form-group">
+                <label>Видео файл</label>
+                <div class="file-input-wrapper">
+                    <label class="file-input-label">
+                        <input type="file" id="videoFile" accept="video/*" onchange="handleFileSelect(event)">
+                        <div>📹 Нажмите или перетащите видео сюда</div>
+                        <div style="font-size: 12px; margin-top: 8px; color: #8b949e;">MP4, WebM, AVI (макс. 100MB)</div>
+                    </label>
+                </div>
+                <div id="fileName" style="margin-top: 8px; font-size: 14px;"></div>
+            </div>
+            <div class="form-group">
+                <label>Название видео</label>
+                <input type="text" id="videoTitle" placeholder="Введите название">
+            </div>
+            <div class="form-group">
+                <label>Описание</label>
+                <textarea id="videoDescription" placeholder="Описание видео"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Категория</label>
+                <select id="videoCategory">
+                    <option value="tutorial">Уроки</option>
+                    <option value="music">Музыка</option>
+                    <option value="gaming">Игры</option>
+                    <option value="tech">Технологии</option>
+                </select>
+            </div>
+            <div class="error" id="uploadError"></div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeModal('uploadModal')">Отмена</button>
+                <button class="btn" onclick="uploadVideo()">Загрузить</button>
+            </div>
+        </div>
+    </div>
 
-// Список CORS-прокси (если один не работает, пробуем другие)
-const PROXIES = [
-  '',  // Сначала попробуем без прокси
-  'https://api.allorigins.win/raw?url=',
-  'https://corsproxy.io/?'
-];
+    <!-- Video Player Modal -->
+    <div class="modal video-player-modal" id="playerModal">
+        <div class="modal-content">
+            <video class="video-player" id="videoPlayer" controls></video>
+            <div class="video-details">
+                <h2 id="playerTitle"></h2>
+                <div class="video-details-meta" id="playerMeta"></div>
+                <div class="video-description" id="playerDescription"></div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeModal('playerModal')">Закрыть</button>
+            </div>
+        </div>
+    </div>
 
-let currentProxyIndex = 0;
+    <script>
+        let currentUser = null;
+        let videos = [];
+        let selectedFile = null;
+        let currentFilter = 'all';
 
-async function apiChat(prompt) {
-  const maxRetries = PROXIES.length;
-  
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      const proxy = PROXIES[currentProxyIndex];
-      const url = proxy ? proxy + encodeURIComponent('https://api.x.ai/v1/chat/completions') : 'https://api.x.ai/v1/chat/completions';
-      
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
+        const users = {
+            admin: { password: 'admin123', canUpload: true, displayName: 'Администратор' },
+            guest: { password: 'guest123', canUpload: false, displayName: 'Гость' }
+        };
 
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'grok-beta',
-          messages: [{
-            role: 'user',
-            content: prompt
-          }],
-          temperature: 0.9,
-          max_tokens: 100
-        }),
-        signal: controller.signal
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        
-        // Специальная обработка ошибки 403
-        if (response.status === 403) {
-          throw new Error('❌ Ошибка авторизации (403).\n\nВозможные причины:\n• Неверный API ключ\n• Ключ истёк или отозван\n• Нет доступа к этой модели\n• Превышен лимит запросов\n\n🔑 Проверьте ключ на https://console.x.ai');
+        async function init() {
+            await loadVideos();
+            renderVideos(videos);
         }
-        
-        let errorMsg = `HTTP ${response.status}`;
-        try {
-          const errorData = JSON.parse(errorText);
-          errorMsg = errorData.error?.message || errorData.message || errorMsg;
-        } catch (e) {
-          errorMsg = errorText || errorMsg;
+
+        async function loadVideos() {
+            try {
+                const result = await window.storage.get('videos');
+                if (result && result.value) {
+                    videos = JSON.parse(result.value);
+                }
+            } catch (error) {
+                console.log('Видео еще не загружены');
+                videos = [];
+            }
         }
-        throw new Error(errorMsg);
-      }
 
-      const data = await response.json();
-      
-      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-        throw new Error('Неверный формат ответа от API');
-      }
-
-      return data.choices[0].message.content;
-      
-    } catch (error) {
-      if (error.name === 'AbortError') {
-        throw new Error('Превышено время ожидания (30 сек). Попробуйте еще раз');
-      }
-      
-      // Если ошибка 403 - не пробуем другие прокси, сразу выходим
-      if (error.message.includes('403')) {
-        throw error;
-      }
-      
-      // Если это последняя попытка - выбрасываем ошибку
-      if (attempt === maxRetries - 1) {
-        if (error.message === 'Failed to fetch') {
-          throw new Error('Не удалось подключиться к API.\nПопробуйте:\n• Проверить интернет\n• Использовать VPN\n• Проверить API ключ');
+        async function saveVideos() {
+            try {
+                await window.storage.set('videos', JSON.stringify(videos));
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+            }
         }
-        throw error;
-      }
-      
-      // Переключаемся на следующий прокси
-      currentProxyIndex = (currentProxyIndex + 1) % PROXIES.length;
-    }
-  }
-}
 
-async function apiImage(prompt) {
-  const maxRetries = PROXIES.length;
-  
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      const proxy = PROXIES[currentProxyIndex];
-      const url = proxy ? proxy + encodeURIComponent('https://api.x.ai/v1/images/generations') : 'https://api.x.ai/v1/images/generations';
-      
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'grok-2-image-1212',
-          prompt: prompt,
-          n: 1,
-          size: '512x512'
-        }),
-        signal: controller.signal
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        
-        // Специальная обработка ошибки 403
-        if (response.status === 403) {
-          throw new Error('❌ Ошибка авторизации (403).\n\nВозможные причины:\n• Неверный API ключ\n• Ключ истёк или отозван\n• Нет доступа к генерации изображений\n• Превышен лимит запросов\n\n🔑 Проверьте ключ на https://console.x.ai');
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.add('active');
+            document.getElementById('loginError').textContent = '';
         }
-        
-        let errorMsg = `HTTP ${response.status}`;
-        try {
-          const errorData = JSON.parse(errorText);
-          errorMsg = errorData.error?.message || errorData.message || errorMsg;
-        } catch (e) {
-          errorMsg = errorText || errorMsg;
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            if (modalId === 'uploadModal') {
+                resetUploadForm();
+            }
+            if (modalId === 'playerModal') {
+                document.getElementById('videoPlayer').pause();
+                document.getElementById('videoPlayer').src = '';
+            }
         }
-        throw new Error(errorMsg);
-      }
 
-      const data = await response.json();
-      
-      if (!data.data || !data.data[0] || !data.data[0].url) {
-        throw new Error('Неверный формат ответа от API');
-      }
+        function login() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
 
-      return data.data[0].url;
-      
-    } catch (error) {
-      if (error.name === 'AbortError') {
-        throw new Error('Превышено время ожидания (30 сек). Попробуйте еще раз');
-      }
-      
-      // Если ошибка 403 - не пробуем другие прокси, сразу выходим
-      if (error.message.includes('403')) {
-        throw error;
-      }
-      
-      // Если это последняя попытка - выбрасываем ошибку
-      if (attempt === maxRetries - 1) {
-        if (error.message === 'Failed to fetch') {
-          throw new Error('Не удалось подключиться к API.\nПопробуйте:\n• Проверить интернет\n• Использовать VPN\n• Проверить API ключ');
+            if (!username || !password) {
+                errorEl.textContent = 'Заполните все поля';
+                return;
+            }
+
+            const user = users[username];
+            if (!user || user.password !== password) {
+                errorEl.textContent = 'Неверное имя пользователя или пароль';
+                return;
+            }
+
+            currentUser = { username, ...user };
+            updateUserUI();
+            closeModal('loginModal');
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
         }
-        throw error;
-      }
-      
-      // Переключаемся на следующий прокси
-      currentProxyIndex = (currentProxyIndex + 1) % PROXIES.length;
-    }
-  }
-}
 
-async function generate() {
-  if (isGenerating) return;
-  
-  apiKey = document.getElementById('apiKey').value.trim();
-  
-  if (!apiKey) {
-    document.getElementById('results').innerHTML = '';
-    showError('Пожалуйста, введите API ключ!');
-    return;
-  }
-  
-  if (!apiKey.startsWith('xai-')) {
-    document.getElementById('results').innerHTML = '';
-    showError('API ключ должен начинаться с "xai-"');
-    return;
-  }
+        function logout() {
+            currentUser = null;
+            updateUserUI();
+        }
 
-  isGenerating = true;
-  document.getElementById('generateBtn').disabled = true;
-  document.getElementById('results').innerHTML = '';
+        function updateUserUI() {
+            const userSection = document.getElementById('userSection');
+            
+            if (currentUser) {
+                userSection.innerHTML = `
+                    <span class="user-name">${currentUser.displayName}</span>
+                    ${currentUser.canUpload ? '<button class="btn" onclick="showUploadModal()">📤 Загрузить</button>' : ''}
+                    <button class="btn btn-secondary" onclick="logout()">Выйти</button>
+                `;
+            } else {
+                userSection.innerHTML = '<button class="btn" onclick="showLoginModal()">Войти</button>';
+            }
+        }
 
-  try {
-    // Генерация идеи
-    const loadingIdea = showLoading('Генерируем идею...');
-    const idea = await apiChat('Придумай одну абсурдную и смешную идею для короткого 5-секундного видео. Напиши только саму идею, одним предложением на русском языке. Будь креативным и неожиданным!');
-    loadingIdea.remove();
-    
-    showResult('🎬 Идея видео:', idea);
+        function showUploadModal() {
+            if (!currentUser || !currentUser.canUpload) {
+                alert('У вас нет прав для загрузки видео');
+                return;
+            }
+            document.getElementById('uploadModal').classList.add('active');
+        }
 
-    // Генерация 3 кадров
-    for (let i = 1; i <= 3; i++) {
-      const loadingFrame = showLoading(`Генерируем кадр ${i}/3...`);
-      
-      try {
-        const imagePrompt = `${idea}. Frame ${i} of 3, cinematic shot, high quality, detailed`;
-        const url = await apiImage(imagePrompt);
-        loadingFrame.remove();
-        
-        const frameDiv = showResult(
-          `🖼️ Кадр ${i}:`,
-          `<div class="url-box">${url}</div>
-           <details>
-             <summary>👁️ Показать изображение</summary>
-             <img src="${url}" alt="Кадр ${i}" onerror="this.parentElement.innerHTML='<p style=color:#ff4444>Не удалось загрузить изображение</p>'">
-           </details>`
-        );
-      } catch (error) {
-        loadingFrame.remove();
-        showError(`Ошибка при генерации кадра ${i}: ${error.message}`);
-      }
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 100 * 1024 * 1024) {
+                    document.getElementById('uploadError').textContent = 'Файл слишком большой (макс. 100MB)';
+                    selectedFile = null;
+                    return;
+                }
+                selectedFile = file;
+                document.getElementById('fileName').textContent = `Выбран: ${file.name}`;
+                document.getElementById('uploadError').textContent = '';
+            }
+        }
 
-      // Небольшая задержка между запросами
-      if (i < 3) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-    }
+        async function uploadVideo() {
+            const title = document.getElementById('videoTitle').value.trim();
+            const description = document.getElementById('videoDescription').value.trim();
+            const category = document.getElementById('videoCategory').value;
+            const errorEl = document.getElementById('uploadError');
 
-    showResult('✅ Готово!', 'Все кадры успешно сгенерированы');
+            if (!selectedFile) {
+                errorEl.textContent = 'Выберите видео файл';
+                return;
+            }
 
-  } catch (error) {
-    showError(error.message);
-  } finally {
-    isGenerating = false;
-    document.getElementById('generateBtn').disabled = false;
-  }
-}
+            if (!title) {
+                errorEl.textContent = 'Введите название видео';
+                return;
+            }
 
-// Обработка Enter в поле ввода
-document.getElementById('apiKey').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter' && !isGenerating) {
-    generate();
-  }
-});
-</script>
+            try {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const videoData = e.target.result;
+                    
+                    const newVideo = {
+                        id: Date.now(),
+                        title,
+                        description,
+                        category,
+                        channel: currentUser.displayName,
+                        views: 0,
+                        date: 'только что',
+                        videoData,
+                        uploadDate: new Date().toISOString()
+                    };
+
+                    videos.unshift(newVideo);
+                    await saveVideos();
+                    
+                    closeModal('uploadModal');
+                    renderVideos(videos);
+                };
+                reader.readAsDataURL(selectedFile);
+            } catch (error) {
+                errorEl.textContent = 'Ошибка загрузки видео';
+                console.error(error);
+            }
+        }
+
+        function resetUploadForm() {
+            document.getElementById('videoTitle').value = '';
+            document.getElementById('videoDescription').value = '';
+            document.getElementById('videoFile').value = '';
+            document.getElementById('fileName').textContent = '';
+            document.getElementById('uploadError').textContent = '';
+            selectedFile = null;
+        }
+
+        function renderVideos(videosToRender) {
+            const grid = document.getElementById('videoGrid');
+            
+            if (videosToRender.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon">📹</div>
+                        <h3>Видео пока нет</h3>
+                        <p style="margin-top: 8px;">Войдите как администратор, чтобы загрузить первое видео</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = videosToRender.map(video => {
+                const iconMap = {
+                    tutorial: '🌐',
+                    music: '🎵',
+                    gaming: '🎮',
+                    tech: '💻'
+                };
+
+                return `
+                    <div class="video-card" onclick="playVideo(${video.id})">
+                        <div class="thumbnail">
+                            ${video.videoData ? 
+                                `<video preload="metadata"><source src="${video.videoData}"></video>` :
+                                `<div class="thumbnail-placeholder">${iconMap[video.category] || '📹'}</div>`
+                            }
+                            <div class="play-icon"></div>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">${video.title}</div>
+                            <div class="video-meta">
+                                <div class="channel-name">${video.channel}</div>
+                                <div class="views-date">${video.views} просмотров • ${video.date}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterVideos(category) {
+            currentFilter = category;
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const filtered = category === 'all' 
+                ? videos 
+                : videos.filter(v => v.category === category);
+            
+            renderVideos(filtered);
+        }
+
+        function searchVideos() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = videos.filter(v => 
+                v.title.toLowerCase().includes(query) || 
+                v.channel.toLowerCase().includes(query)
+            );
+            renderVideos(filtered);
+        }
+
+        async function playVideo(id) {
+            const video = videos.find(v => v.id === id);
+            if (!video) return;
+
+            video.views++;
+            await saveVideos();
+
+            const modal = document.getElementById('playerModal');
+            const player = document.getElementById('videoPlayer');
+            
+            if (video.videoData) {
+                player.src = video.videoData;
+                document.getElementById('playerTitle').textContent = video.title;
+                document.getElementById('playerMeta').textContent = 
+                    `${video.channel} • ${video.views} просмотров • ${video.date}`;
+                document.getElementById('playerDescription').textContent = 
+                    video.description || 'Нет описания';
+                
+                modal.classList.add('active');
+                player.play();
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchVideos();
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                const modals = ['loginModal', 'uploadModal', 'playerModal'];
+                modals.forEach(modalId => {
+                    if (e.target.id === modalId) {
+                        closeModal(modalId);
+                    }
+                });
+            }
+        });
+
+        init();
+    </script>
 </body>
 </html>
