@@ -3,90 +3,498 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мини Видеохостинг - Home</title>
-    
+    <title>VideoHub</title>
     <style>
-        body { font-family: sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
-        header { background-color: #cc0000; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.5em; font-weight: bold; }
-        nav a { color: white; text-decoration: none; margin-left: 20px; }
-        main { padding: 20px; }
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .video-item { background-color: white; border: 1px solid #ddd; padding: 10px; }
-        .video-item img { width: 100%; height: auto; display: block; }
-        .auth-controls button { margin-left: 10px; padding: 5px 10px; cursor: pointer; }
-        
-        /* Стили для формы загрузки */
-        #upload-section { margin-top: 30px; padding: 20px; background-color: #fff; border: 1px solid #ddd; }
-    </style>
-    </head>
-<body>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+        }
+
+        header {
+            background: #161b22;
+            padding: 12px 24px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #58a6ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            display: flex;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 10px 16px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 4px 0 0 4px;
+            color: #c9d1d9;
+            outline: none;
+        }
+
+        .search-bar input:focus {
+            border-color: #58a6ff;
+        }
+
+        .search-bar button {
+            padding: 10px 20px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-left: none;
+            border-radius: 0 4px 4px 0;
+            color: #c9d1d9;
+            cursor: pointer;
+        }
+
+        .search-bar button:hover {
+            background: #30363d;
+        }
+
+        main {
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 20px;
+            color: #c9d1d9;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: #58a6ff;
+            color: #0d1117;
+            border-color: #58a6ff;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .video-card {
+            background: #161b22;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #30363d;
+        }
+
+        .video-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            border-color: #58a6ff;
+        }
+
+        .thumbnail {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #238636, #58a6ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        .video-info {
+            padding: 12px;
+        }
+
+        .video-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .video-meta {
+            font-size: 14px;
+            color: #8b949e;
+        }
+
+        .channel-name {
+            margin-bottom: 4px;
+        }
+
+        .views-date {
+            font-size: 13px;
+        }
+
+        .play-icon {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 10;
+        }
+
+        .video-card:hover .play-icon {
+            opacity: 1;
+        }
+
+        .play-icon::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-left: 20px solid white;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            margin-left: 4px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #161b22;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            max-width: 1200px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .video-player {
+            width: 100%;
+            background: #000;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .video-details {
+            padding: 16px;
+        }
+
+        .video-details h2 {
+            margin-bottom: 12px;
+        }
+
+        .video-details-meta {
+            color: #8b949e;
+            margin-bottom: 16px;
+        }
+
+        .video-description {
+            line-height: 1.6;
+            color: #c9d1d9;
+            white-space: pre-wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            background: #238636;
+            border: 1px solid #2ea043;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #2ea043;
+        }
+
+        .btn-secondary {
+            background: #21262d;
+            border-color: #30363d;
+        }
+
+        .btn-secondary:hover {
+            background: #30363d;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8b949e;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
     <header>
-        <div class="logo">📺 МиниTube</div>
-        <nav>
-            <a href="#home">Главная</a>
-            <a href="$$URL\ КАНАЛОВ$$">Каналы</a>
-        </nav>
-        <div class="auth-controls">
-            <button onclick="window.location.href='$$URL\ ЗАГРУЗКИ$$'">Загрузить видео</button>
-            <button onclick="window.location.href='$$URL\ ВХОДА$$'">Войти</button>
+        <div class="logo">
+            <span>▶</span> VideoHub
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Поиск видео..." id="searchInput">
+            <button onclick="searchVideos()">🔍</button>
         </div>
     </header>
 
     <main>
-        
-        <section id="home">
-            <h2>Популярные видео</h2>
-            <div class="video-grid">
-                
-                <div class="video-item">
-                    <a href="$$URL\ ВИДЕО\ 1$$">
-                        <img src="$$URL\ ОБЛОЖКИ\ 1$$" alt="Название видео 1">
-                        <h3>Название видео 1</h3>
-                    </a>
-                    <p>Автор: <a href="$$URL\ АВТОРА\ 1$$">Имя_Аккаунта</a></p>
-                    <small>Просмотры: 1234 | Дата: 23.10.2025</small>
-                </div>
-                
-                <div class="video-item">
-                    <a href="$$URL\ ВИДЕО\ 2$$">
-                        <img src="$$URL\ ОБЛОЖКИ\ 2$$" alt="Название видео 2">
-                        <h3>Название видео 2</h3>
-                    </a>
-                    <p>Автор: <a href="$$URL\ АВТОРА\ 2$$">Имя_Аккаунта_2</a></p>
-                    <small>Просмотры: 567 | Дата: 22.10.2025</small>
-                </div>
-                </div>
-        </section>
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterVideos('all')">Все</button>
+            <button class="filter-btn" onclick="filterVideos('tutorial')">Уроки</button>
+            <button class="filter-btn" onclick="filterVideos('music')">Музыка</button>
+            <button class="filter-btn" onclick="filterVideos('gaming')">Игры</button>
+            <button class="filter-btn" onclick="filterVideos('tech')">Технологии</button>
+        </div>
 
-        <hr>
-
-        <section id="upload-section">
-            <h2>Форма загрузки (для аккаунтов)</h2>
-            <form action="$$URL\ ДЛЯ\ ОТПРАВКИ\ ФАЙЛА$$" method="POST" enctype="multipart/form-data">
-                
-                <p>
-                    <label for="title">Название видео:</label>
-                    <input type="text" id="title" name="title" required style="width: 98%;">
-                </p>
-                <p>
-                    <label for="description">Описание:</label>
-                    <textarea id="description" name="description" rows="4" style="width: 98%;"></textarea>
-                </p>
-                <p>
-                    <label for="video_file">Выберите видеофайл:</label>
-                    <input type="file" id="video_file" name="video_file" accept="video/*" required>
-                </p>
-                <button type="submit">Загрузить</button>
-            </form>
-        </section>
-
+        <div class="video-grid" id="videoGrid"></div>
     </main>
 
-    <footer>
-        <p>&copy; 2025 Мини Видеохостинг. Все права защищены.</p>
-    </footer>
+    <!-- Video Player Modal -->
+    <div class="modal video-player-modal" id="playerModal">
+        <div class="modal-content">
+            <div id="playerContainer">
+                <video class="video-player" id="videoPlayer" controls></video>
+            </div>
+            <div class="video-details">
+                <h2 id="playerTitle"></h2>
+                <div class="video-details-meta" id="playerMeta"></div>
+                <div class="video-description" id="playerDescription"></div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeModal('playerModal')">Закрыть</button>
+            </div>
+        </div>
+    </div>
 
+    <script>
+        let videos = [];
+        let currentFilter = 'all';
+
+        async function init() {
+            await loadVideos();
+            renderVideos(videos);
+        }
+
+        async function loadVideos() {
+            try {
+                const result = await window.storage.get('videos', true);
+                if (result && result.value) {
+                    videos = JSON.parse(result.value);
+                }
+            } catch (error) {
+                console.log('Видео еще не загружены');
+                videos = [];
+            }
+        }
+
+        async function saveVideos() {
+            try {
+                await window.storage.set('videos', JSON.stringify(videos), true);
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            if (modalId === 'playerModal') {
+                const player = document.getElementById('videoPlayer');
+                player.pause();
+                player.src = '';
+                const container = document.getElementById('playerContainer');
+                container.innerHTML = '<video class="video-player" id="videoPlayer" controls></video>';
+            }
+        }
+
+        function renderVideos(videosToRender) {
+            const grid = document.getElementById('videoGrid');
+            
+            if (videosToRender.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon">📹</div>
+                        <h3>Видео пока нет</h3>
+                        <p style="margin-top: 8px;">Скоро здесь появятся интересные видео!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const iconMap = {
+                tutorial: '🌐',
+                music: '🎵',
+                gaming: '🎮',
+                tech: '💻'
+            };
+
+            grid.innerHTML = videosToRender.map(video => `
+                <div class="video-card" onclick="playVideo(${video.id})">
+                    <div class="thumbnail">
+                        ${video.thumbnailUrl ? 
+                            `<img src="${video.thumbnailUrl}" alt="${video.title}">` :
+                            `<div class="thumbnail-placeholder">${iconMap[video.category] || '📹'}</div>`
+                        }
+                        <div class="play-icon"></div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">${video.title}</div>
+                        <div class="video-meta">
+                            <div class="channel-name">${video.channel}</div>
+                            <div class="views-date">${video.views} просмотров • ${video.date}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterVideos(category) {
+            currentFilter = category;
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const filtered = category === 'all' 
+                ? videos 
+                : videos.filter(v => v.category === category);
+            
+            renderVideos(filtered);
+        }
+
+        function searchVideos() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = videos.filter(v => 
+                v.title.toLowerCase().includes(query) || 
+                v.channel.toLowerCase().includes(query) ||
+                (v.description && v.description.toLowerCase().includes(query))
+            );
+            renderVideos(filtered);
+        }
+
+        async function playVideo(id) {
+            const video = videos.find(v => v.id === id);
+            if (!video) return;
+
+            video.views++;
+            await saveVideos();
+
+            const modal = document.getElementById('playerModal');
+            const container = document.getElementById('playerContainer');
+            
+            if (video.storageType === 'gdrive') {
+                const iframe = document.createElement('iframe');
+                iframe.src = video.videoUrl;
+                iframe.style.width = '100%';
+                iframe.style.height = '600px';
+                iframe.style.border = 'none';
+                iframe.style.borderRadius = '8px';
+                iframe.allow = 'autoplay';
+                
+                container.innerHTML = '';
+                container.appendChild(iframe);
+            } else {
+                container.innerHTML = '<video class="video-player" id="videoPlayer" controls></video>';
+                const player = document.getElementById('videoPlayer');
+                player.src = video.videoUrl;
+                player.play();
+            }
+
+            document.getElementById('playerTitle').textContent = video.title;
+            document.getElementById('playerMeta').textContent = 
+                `${video.channel} • ${video.views} просмотров • ${video.date}`;
+            document.getElementById('playerDescription').textContent = 
+                video.description || 'Нет описания';
+            
+            modal.classList.add('active');
+
+            // Обновляем отображение после увеличения просмотров
+            const currentVideos = currentFilter === 'all' 
+                ? videos 
+                : videos.filter(v => v.category === currentFilter);
+            renderVideos(currentVideos);
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchVideos();
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                if (e.target.id === 'playerModal') {
+                    closeModal('playerModal');
+                }
+            }
+        });
+
+        init();
+    </script>
 </body>
 </html>
